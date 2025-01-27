@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { useInView } from 'react-intersection-observer';
 import {
@@ -10,6 +10,7 @@ import {
   FaLinkedin,
   FaInstagram,
 } from 'react-icons/fa';
+import emailjs from 'emailjs-com';
 
 const Contact = () => {
   const { ref, inView } = useInView({
@@ -17,8 +18,51 @@ const Contact = () => {
     threshold: 0.2,
   });
 
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    budget: '',
+    message: '',
+  });
+
+  const [status, setStatus] = useState(''); 
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const emailParams = {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      budget: formData.budget,
+      message: formData.message,
+    };
+
+    emailjs
+      .send(
+        'service_1abotmp', 
+        'template_sjzo94d', 
+        emailParams, 
+        'Agyd0ozhEXpMoVF22' 
+      )
+      .then(
+        (result) => {
+          setStatus('Message sent successfully!');
+          setFormData({ name: '', email: '', phone: '', budget: '', message: '' });
+        },
+        (error) => {
+          setStatus('Oops! Something went wrong. Please try again later.');
+        }
+      );
+  };
+
   return (
-    <div id="contact" >
+    <div id="contact">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-12">
         <motion.h2
           ref={ref}
@@ -103,15 +147,22 @@ const Contact = () => {
           animate={inView ? { opacity: 1, x: 0 } : {}}
           transition={{ delay: 0.8, duration: 0.5 }}
           className="space-y-4 text-white"
+          onSubmit={handleSubmit}
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <input
               type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
               placeholder="Your Full Name"
               className="border border-purple-500 bg-gray-800 p-4 rounded-md w-full"
             />
             <input
               type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
               placeholder="Your Email"
               className="border border-purple-500 bg-gray-800 p-4 rounded-md w-full"
             />
@@ -119,16 +170,25 @@ const Contact = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <input
               type="text"
+              name="phone"
+              value={formData.phone}
+              onChange={handleInputChange}
               placeholder="Your Phone Number"
               className="border border-purple-500 bg-gray-800 p-4 rounded-md w-full"
             />
             <input
               type="text"
+              name="budget"
+              value={formData.budget}
+              onChange={handleInputChange}
               placeholder="Your Budget"
               className="border border-purple-500 bg-gray-800 p-4 rounded-md w-full"
             />
           </div>
           <textarea
+            name="message"
+            value={formData.message}
+            onChange={handleInputChange}
             placeholder="Message"
             className="border border-purple-500 bg-gray-800 p-4 rounded-md w-full"
           ></textarea>
@@ -140,6 +200,11 @@ const Contact = () => {
           >
             Send Message
           </motion.button>
+          {status && (
+            <div className={`mt-4 text-center text-lg ${status.includes('success') ? 'text-green-500' : 'text-red-500'}`}>
+              {status}
+            </div>
+          )}
         </motion.form>
       </div>
 
