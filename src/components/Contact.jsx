@@ -51,11 +51,11 @@ const Contact = () => {
         'Agyd0ozhEXpMoVF22' 
       )
       .then(
-        (result) => {
+        () => {
           setStatus('Message sent successfully!');
           setFormData({ name: '', email: '', phone: '', budget: '', message: '' });
         },
-        (error) => {
+        () => {
           setStatus('Oops! Something went wrong. Please try again later.');
         }
       );
@@ -87,9 +87,7 @@ const Contact = () => {
         </motion.p>
       </div>
 
-      {/* Contact Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left Column - Contact Info */}
         <div className="space-y-6">
           <motion.div
             ref={ref}
@@ -140,7 +138,6 @@ const Contact = () => {
           </motion.div>
         </div>
 
-        {/* Right Column - Form */}
         <motion.form
           ref={ref}
           initial={{ opacity: 0, x: 50 }}
@@ -208,7 +205,6 @@ const Contact = () => {
         </motion.form>
       </div>
 
-      {/* Footer */}
       <motion.div
         ref={ref}
         initial={{ opacity: 0 }}
