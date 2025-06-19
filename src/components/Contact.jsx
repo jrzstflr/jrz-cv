@@ -26,7 +26,8 @@ const Contact = () => {
     message: '',
   });
 
-  const [status, setStatus] = useState(''); 
+  const [status, setStatus] = useState('');
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -45,10 +46,10 @@ const Contact = () => {
 
     emailjs
       .send(
-        'service_1abotmp', 
-        'template_sjzo94d', 
-        emailParams, 
-        'Agyd0ozhEXpMoVF22' 
+        'service_1abotmp',
+        'template_sjzo94d',
+        emailParams,
+        'Agyd0ozhEXpMoVF22'
       )
       .then(
         () => {
@@ -189,6 +190,18 @@ const Contact = () => {
             placeholder="Message"
             className="border border-purple-500 bg-gray-800 p-4 rounded-md w-full"
           ></textarea>
+
+          <p className="text-sm text-slate-400">
+            By providing my phone number to Jeruz Abiera, I agree and acknowledge that Jeruz Abiera may send text messages to my wireless phone number for any purpose. Message and data rates may apply. Message frequency will vary, and you will be able to Opt-out by replying “STOP”. For more information on how your data will be handled, please visit{' '}
+            <button
+              type="button"
+              onClick={() => setIsPrivacyOpen(true)}
+              className="text-purple-400 underline hover:text-purple-600"
+            >
+              Privacy Policy
+            </button>.
+          </p>
+
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -218,17 +231,36 @@ const Contact = () => {
           <a href="https://www.facebook.com/JrzStflrFB" className="hover:text-purple-500">
             <FaFacebook className="w-6 h-6" />
           </a>
-          <a href='https://www.github.com/jrzstflr' className="hover:text-purple-500">
+          <a href="https://www.github.com/jrzstflr" className="hover:text-purple-500">
             <FaGithub className="w-6 h-6" />
           </a>
-          <a href='https://www.linkedin.com/in/jeruzabiera' className="hover:text-purple-500">
+          <a href="https://www.linkedin.com/in/jeruzabiera" className="hover:text-purple-500">
             <FaLinkedin className="w-6 h-6" />
           </a>
-          <a href='https://www.instagram.com/jrzstflr' className="hover:text-purple-500">
+          <a href="https://www.instagram.com/jrzstflr" className="hover:text-purple-500">
             <FaInstagram className="w-6 h-6" />
           </a>
         </div>
       </motion.div>
+
+      {/* Privacy Policy Modal */}
+      {isPrivacyOpen && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center">
+          <div className="bg-gray-900 text-white rounded-lg p-6 max-w-lg w-full relative shadow-lg border border-purple-500">
+            <h3 className="text-xl font-semibold mb-4 text-purple-400">Privacy Policy</h3>
+            <p className="text-sm text-gray-300">
+              No mobile information will be shared with third parties/affiliates for marketing/promotional purposes. All the above categories exclude text messaging originator opt-in data and consent; this information will not be shared with any third parties.
+            </p>
+            <button
+              onClick={() => setIsPrivacyOpen(false)}
+              className="absolute top-2 right-3 text-white hover:text-purple-400 text-lg"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
