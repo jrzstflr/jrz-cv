@@ -192,7 +192,7 @@ const Contact = () => {
           ></textarea>
 
           <p className="text-sm text-slate-400">
-            By providing my phone number to Jeruz Abiera, I agree and acknowledge that Jeruz Abiera may send text messages to my wireless phone number for any purpose. Message and data rates may apply. Message frequency will vary, and you will be able to Opt-out by replying “STOP”. For more information on how your data will be handled, please visit{' '}
+            By providing my phone number to Jeruz Abiera, I agree and acknowledge that Jeruz Abiera may send text messages to my wireless phone number for any purpose. Message and data rates may apply. Message frequency will vary, and you will be able to Opt-out by replying “STOP”. For more information on how your data will be handled, please click{' '}
             <button
               type="button"
               onClick={() => setIsPrivacyOpen(true)}
