@@ -64,7 +64,7 @@ const Work = () => {
           transition={{ delay: 0.5, duration: 0.5 }}
           className='mb-12 text-gray-400 text-center'
         >
-          A showcase of my featured projects including e-commerce platforms, web apps, and portfolio designs.
+          A curated selection of my featured projects — from e-commerce platforms and dynamic web applications to sleek portfolio designs, each built with performance and user experience in mind.
         </motion.p>
 
         <div ref={gridRef} className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8'>

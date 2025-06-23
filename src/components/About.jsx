@@ -26,7 +26,7 @@ const About = () => {
                 transition={{ delay: 0.5, duration: 0.5 }}
                 className="mb-12 text-gray-400 text-opacity-80"
               >
-                Hello, I'm Jeruz, a passionate Frontend Developer skilled in HTML, CSS, JavaScript, React and TailwindCSS. I love building creative and responsive web applications.
+                Hi, I'm Jeruz — a Frontend Developer passionate about crafting interactive, responsive and visually striking web experiences.
               </motion.p>
 
               <div className="flex flex-col md:flex-row justify-center items-center">
@@ -45,7 +45,7 @@ const About = () => {
                   transition={{ delay: 0.6, duration: 0.5 }}
                   className="md:w-1/2 text-gray-400 px-4 md:px-0 text-base sm:text-lg md:text-xl"
                 >
-                  I am currently working with 8x8, where I began as a Technical Support Engineer. In this role, I provided essential support to clients by troubleshooting and resolving complex technical issues related to VOIP systems, softphones, and network configurations. My expertise includes configuring desk phones from leading providers such as Cisco, Polycom, and Yealink, ensuring seamless integration and adherence to technical standards. Recently, I was promoted to SME (Subject Matter Expert), where I now mentor and guide fellow engineers by sharing the knowledge and expertise I have developed over the years. My focus is on upholding service level agreements (SLAs) while fostering a customer-first mindset to deliver exceptional service and support.
+                  Currently, I work at 8x8, where I started as a Technical Support Engineer and have since been promoted to Subject Matter Expert (SME). In my role, I troubleshoot and resolve complex VOIP, softphone, and network-related issues, while ensuring smooth configuration and deployment of devices from top providers like Cisco, Polycom, and Yealink. Now, as an SME, I mentor fellow engineers, uphold SLAs, and champion a customer-first approach to deliver exceptional technical support.
                 </motion.p>
               </div>
 

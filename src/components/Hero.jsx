@@ -48,7 +48,7 @@ const Hero = () => {
         >
           Welcome to My Digital Portfolio – Where Innovation Meets Expertise.
           <br />
-          With a strong foundation in Web Development and a passion for crafting intuitive, dynamic user experiences, I bring both creativity and technical precision to every project.
+          With a solid foundation in Web Development and a passion for building seamless, user-centric interfaces, I blend creativity with technical precision to bring ideas to life.
         </motion.p>
 
         <div className='flex justify-center space-x-4 mb-10'>

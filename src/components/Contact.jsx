@@ -134,7 +134,7 @@ const Contact = () => {
             </div>
             <div>
               <p className="text-lg font-medium text-purple-500">Location</p>
-              <p className="text-white">Mabalacat City, Pampanga 2010</p>
+              <p className="text-white">Philippines</p>
             </div>
           </motion.div>
         </div>
@@ -234,7 +234,7 @@ const Contact = () => {
           <a href="https://www.github.com/jrzstflr" className="hover:text-purple-500">
             <FaGithub className="w-6 h-6" />
           </a>
-          <a href="https://www.linkedin.com/in/jeruzabiera" className="hover:text-purple-500">
+          <a href="https://www.linkedin.com/in/jeruza" className="hover:text-purple-500">
             <FaLinkedin className="w-6 h-6" />
           </a>
           <a href="https://www.instagram.com/jrzstflr" className="hover:text-purple-500">
