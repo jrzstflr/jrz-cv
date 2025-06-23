@@ -26,7 +26,7 @@ const About = () => {
                 transition={{ delay: 0.5, duration: 0.5 }}
                 className="mb-12 text-gray-400 text-opacity-80"
               >
-                Hello, I'm Jeruz Abiera, a passionate Frontend Developer skilled in HTML, CSS, JavaScript, React and TailwindCSS. I love building creative and responsive web applications.
+                Hello, I'm Jeruz, a passionate Frontend Developer skilled in HTML, CSS, JavaScript, React and TailwindCSS. I love building creative and responsive web applications.
               </motion.p>
 
               <div className="flex flex-col md:flex-row justify-center items-center">
