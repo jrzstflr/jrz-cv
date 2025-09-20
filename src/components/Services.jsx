@@ -7,6 +7,9 @@ import Slider from "react-slick"
 import certificate1 from "../assets/certificate1.png"
 import certificate2 from "../assets/certificate2.png"
 import comptia1 from "../assets/comptia1.jpeg"
+import aws1 from "../assets/aws1.png"
+import frontend from "../assets/frontend.jpeg"
+import jrzlogo from "../assets/jrzlogo.png"
 import Modal from "./Modal"
 
 const Services = () => {
@@ -48,9 +51,10 @@ const Services = () => {
       description:
         "Comprehensive certification covering modern web development practices, including responsive design, JavaScript frameworks, and full-stack development principles.",
       skills: ["React", "JavaScript", "CSS", "Node.js", "Database Design"],
-      image: "/web-development-certificate-modern.jpg",
-      issuer: "Tech Institute",
-      date: "2024",
+      image: frontend,
+      link: "https://www.linkedin.com/learning/paths/explore-a-career-in-front-end-web-development?u=142281146",
+      issuer: "LinkedIn Learning",
+      date: "2025",
       status: "in-progress",
     },
     {
@@ -59,9 +63,9 @@ const Services = () => {
       description:
         "Advanced certification in cloud computing platforms, covering deployment, scaling, and management of cloud-based applications and infrastructure.",
       skills: ["AWS", "Docker", "Kubernetes", "CI/CD", "Infrastructure as Code"],
-      image: "/cloud-computing-certificate-aws.jpg",
+      image: aws1,
       issuer: "AWS",
-      date: "2024",
+      date: "N/A",
       status: "planned",
     },
     {
@@ -71,7 +75,7 @@ const Services = () => {
         "CompTIA A+ is a globally recognized entry-level certification for individuals starting their career in information technology. It validates the foundational skills needed by IT professionals to support and troubleshoot hardware, software, networks, and security across various devices and operating systems.",
       skills: ["Hardware and software troubleshooting", "Operating systems support", "Networking fundamentals", "Security basics", "Customer support", "Problem-solving", "Documentation", "IT best practices"],
       image: comptia1,
-      link: "https://shorturl.at/qUTuR",
+      link: "https://www.linkedin.com/learning/paths/8x8-technical-certification-foundation-learning-path?u=142281146",
       issuer: "8x8",
       date: "2025",
       status: "in-progress",
@@ -82,9 +86,9 @@ const Services = () => {
       description:
         "Professional certification in project management methodologies, team leadership, and strategic planning for technology projects.",
       skills: ["Agile", "Scrum", "Team Leadership", "Strategic Planning", "Risk Assessment"],
-      image: "/project-management-certificate-professional.jpg",
-      issuer: "PMI",
-      date: "2025",
+      image: jrzlogo,
+      issuer: "N/A",
+      date: "N/A",
       status: "planned",
     },
   ]
