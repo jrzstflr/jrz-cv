@@ -48,7 +48,7 @@ const Hero = () => {
         >
           Welcome to My Digital Portfolio – Where Innovation Meets Expertise.
           <br />
-          With a solid foundation in Web Development and a passion for building seamless, user-centric interfaces, I blend creativity with technical precision to bring ideas to life.
+          I’m a Technical Support Specialist with expertise in troubleshooting software, hardware, VOIP, and network-related issues. I thrive on solving complex problems, mentoring teams, and ensuring seamless technology performance with a customer-first approach. With a foundation in Web Development, I also bring a creative edge to technical challenges, bridging problem-solving precision with innovative solutions.
         </motion.p>
 
         <div className='flex justify-center space-x-4 mb-10'>

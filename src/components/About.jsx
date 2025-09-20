@@ -26,7 +26,7 @@ const About = () => {
                 transition={{ delay: 0.5, duration: 0.5 }}
                 className="mb-12 text-gray-400 text-opacity-80"
               >
-                Hi, I'm Jeruz — a Frontend Developer passionate about crafting interactive, responsive and visually striking web experiences.
+                Hi, I’m Jeruz! I currently work as a Technical Support Specialist, where I help customers and businesses by troubleshooting and solving technical issues across software, hardware, and VOIP systems. At the same time, I’m passionate about Frontend Development, building interactive and engaging websites that bring ideas to life. I thrive at the intersection of problem-solving and creativity — ensuring technology not only works, but works beautifully.
               </motion.p>
 
               <div className="flex flex-col md:flex-row justify-center items-center">
@@ -45,7 +45,9 @@ const About = () => {
                   transition={{ delay: 0.6, duration: 0.5 }}
                   className="md:w-1/2 text-gray-400 px-4 md:px-0 text-base sm:text-lg md:text-xl"
                 >
-                  Currently, I work at 8x8, where I started as a Technical Support Engineer and have since been promoted to Subject Matter Expert (SME). In my role, I troubleshoot and resolve complex VOIP, softphone, and network-related issues, while ensuring smooth configuration and deployment of devices from top providers like Cisco, Polycom, and Yealink. Now, as an SME, I mentor fellow engineers, uphold SLAs, and champion a customer-first approach to deliver exceptional technical support.
+                  Currently at 8x8, I began as a Technical Support Engineer and have since advanced to Subject Matter Expert (SME). In this role, I handle intricate VOIP, softphone, and network-related issues, while ensuring the smooth configuration and deployment of devices from top providers like Cisco, Polycom, and Yealink.
+                  As an SME, I mentor and guide fellow engineers, uphold SLAs, and champion a customer-first approach, ensuring clients receive exceptional support and reliable solutions. My ability to stay calm under pressure, think critically, and communicate clearly has been key to resolving escalated cases and improving team performance.
+                  Beyond support, I’m also passionate about Frontend Development, where I explore creating interactive, responsive, and visually engaging websites. This blend of technical troubleshooting expertise and creative development skills allows me to deliver both seamless technology performance and modern digital experiences.
                 </motion.p>
               </div>
 
