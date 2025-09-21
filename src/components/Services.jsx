@@ -70,7 +70,7 @@ const Services = () => {
     },
     {
       title: "CompTia A+",
-      category: "Technical Support",
+      category: "development",
       description:
         "CompTIA A+ is a globally recognized entry-level certification for individuals starting their career in information technology. It validates the foundational skills needed by IT professionals to support and troubleshoot hardware, software, networks, and security across various devices and operating systems.",
       skills: ["Hardware and software troubleshooting", "Operating systems support", "Networking fundamentals", "Security basics", "Customer support", "Problem-solving", "Documentation", "IT best practices"],
