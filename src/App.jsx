@@ -7,6 +7,7 @@ import About from './components/About';
 import Services from './components/Services';
 import Work from './components/Work';
 import Contact from './components/Contact';
+import ChatBot from './components/ChatBot';
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
       <Services />
       <Work />
       <Contact />
+      <ChatBot /> 
     </div>
   )
 }
