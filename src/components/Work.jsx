@@ -5,13 +5,17 @@ import project1 from "../assets/project1.png"
 import project2 from "../assets/project2.png"
 import project3 from "../assets/project3.png"
 import project4 from "../assets/project4.png"
-import { motion } from "motion/react"
+import project5 from "../assets/project5.png"
+import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import Companies from "./Companies"
+import Modal from "./Modal"
 
 const Work = () => {
   const [filter, setFilter] = useState("all")
   const [hoveredProject, setHoveredProject] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedProject, setSelectedProject] = useState(null)
 
   const { ref: headingRef, inView: headingInView } = useInView({ triggerOnce: true, threshold: 0.2 })
   const { ref: subTextRef, inView: subTextInView } = useInView({ triggerOnce: true, threshold: 0.2 })
@@ -67,11 +71,33 @@ const Work = () => {
       status: "Live",
       year: "2024",
     },
+    {
+      id: 5,
+      title: "8x8 Audit Management",
+      description:
+        "8x8 AuditTrail Conversations. A web app designed for 8x8 customers to easily upload and review JSON audit trail files. Quickly access, analyze, and track conversation history for better visibility and troubleshooting.",
+      image: project5,
+      link: "https://jrzfiltertool.vercel.app/",
+      category: "app",
+      techStack: ["React", "Node,JS", "JavaScript"],
+      status: "Live",
+      year: "2025",
+    },
   ]
 
   const filteredProjects = filter === "all" ? projects : projects.filter((project) => project.category === filter)
 
   const categories = ["all", "web", "app"]
+
+  const openModal = (project) => {
+    setSelectedProject(project)
+    setIsModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false)
+    setSelectedProject(null)
+  }
 
   return (
     <div id="work" className="py-16 bg-gradient-to-b from-gray-900 to-black">
@@ -191,6 +217,7 @@ const Work = () => {
                   </a>
 
                   <button
+                    onClick={() => openModal(project)}
                     className="px-4 py-3 border-2 border-purple-500/50 text-purple-400 rounded-xl hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800"
                     aria-label={`View details for ${project.title}`}
                   >
@@ -245,6 +272,21 @@ const Work = () => {
       >
         <Companies />
       </motion.div>
+
+      {isModalOpen && selectedProject && (
+        <Modal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          title={selectedProject.title}
+          image={selectedProject.image}
+          link={selectedProject.link}
+          description={selectedProject.description}
+          techStack={selectedProject.techStack}
+          status={selectedProject.status}
+          year={selectedProject.year}
+          buttonText="View Project"
+        />
+      )}
     </div>
   )
 }

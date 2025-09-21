@@ -3,12 +3,12 @@
 import React from "react"
 import { motion, AnimatePresence } from "motion/react"
 
-const Modal = ({ isOpen, onClose, image, title, link, description }) => {
-  const handleViewCertificate = () => {
+const Modal = ({ isOpen, onClose, image, title, link, description, buttonText = "View Certificate" }) => {
+  const handleViewItem = () => {
     if (link && link !== "#") {
       window.open(link, "_blank", "noopener,noreferrer")
     } else {
-      alert("Certificate link not available")
+      alert(`${buttonText.replace("View ", "")} link not available`)
     }
   }
 
@@ -79,7 +79,7 @@ const Modal = ({ isOpen, onClose, image, title, link, description }) => {
 
               <div className="flex gap-3 justify-center">
                 <button
-                  onClick={handleViewCertificate}
+                  onClick={handleViewItem}
                   className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25 flex items-center gap-2"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,7 +90,7 @@ const Modal = ({ isOpen, onClose, image, title, link, description }) => {
                       d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                     />
                   </svg>
-                  View Certificate
+                  {buttonText}
                 </button>
 
                 <button
@@ -102,7 +102,7 @@ const Modal = ({ isOpen, onClose, image, title, link, description }) => {
               </div>
 
               {link && link !== "#" && (
-                <p className="text-white/60 text-sm mt-4">Click "View Certificate" to open in a new tab</p>
+                <p className="text-white/60 text-sm mt-4">Click "{buttonText}" to open in a new tab</p>
               )}
             </div>
           </motion.div>
