@@ -1,15 +1,14 @@
 "use client"
 
-import { useState } from "react"
-import { motion } from "motion/react"
+import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
-import Slider from "react-slick"
 import certificate1 from "../assets/certificate1.png"
 import certificate2 from "../assets/certificate2.png"
-import comptia1 from "../assets/comptia1.jpeg"
 import aws1 from "../assets/aws1.png"
+import comptia1 from "../assets/comptia1.jpeg"
 import frontend from "../assets/frontend.jpeg"
-import jrzlogo from "../assets/jrzlogo.png"
+import jrzLogo from "../assets/jrzlogo.png"
 import Modal from "./Modal"
 
 const Services = () => {
@@ -19,6 +18,9 @@ const Services = () => {
   const [modalDescription, setModalDescription] = useState("")
   const [modalLink, setModalLink] = useState("")
   const [filter, setFilter] = useState("all")
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [hoveredCertificate, setHoveredCertificate] = useState(null)
 
   const servicesData = [
     {
@@ -73,7 +75,16 @@ const Services = () => {
       category: "development",
       description:
         "CompTIA A+ is a globally recognized entry-level certification for individuals starting their career in information technology. It validates the foundational skills needed by IT professionals to support and troubleshoot hardware, software, networks, and security across various devices and operating systems.",
-      skills: ["Hardware and software troubleshooting", "Operating systems support", "Networking fundamentals", "Security basics", "Customer support", "Problem-solving", "Documentation", "IT best practices"],
+      skills: [
+        "Hardware and software troubleshooting",
+        "Operating systems support",
+        "Networking fundamentals",
+        "Security basics",
+        "Customer support",
+        "Problem-solving",
+        "Documentation",
+        "IT best practices",
+      ],
       image: comptia1,
       link: "https://www.linkedin.com/learning/paths/8x8-technical-certification-foundation-learning-path?u=142281146",
       issuer: "8x8",
@@ -86,7 +97,7 @@ const Services = () => {
       description:
         "Professional certification in project management methodologies, team leadership, and strategic planning for technology projects.",
       skills: ["Agile", "Scrum", "Team Leadership", "Strategic Planning", "Risk Assessment"],
-      image: jrzlogo,
+      image: jrzLogo,
       issuer: "N/A",
       date: "N/A",
       status: "planned",
@@ -98,36 +109,31 @@ const Services = () => {
     threshold: 0.2,
   })
 
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    autoplay: true,
-    autoplaySpeed: 4000,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    pauseOnHover: true,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 640,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
-    customPaging: (i) => (
-      <div className="w-3 h-3 bg-purple-300 rounded-full opacity-50 hover:opacity-100 transition-opacity duration-200" />
-    ),
-    dotsClass: "slick-dots !bottom-[-50px]",
+  const filteredServices =
+    filter === "all" ? servicesData : servicesData.filter((service) => service.category === filter)
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % filteredServices.length)
   }
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + filteredServices.length) % filteredServices.length)
+  }
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index)
+  }
+
+  useEffect(() => {
+    if (isAutoPlaying && filteredServices.length > 1) {
+      const interval = setInterval(nextSlide, 5000)
+      return () => clearInterval(interval)
+    }
+  }, [isAutoPlaying, filteredServices.length])
+
+  useEffect(() => {
+    setCurrentSlide(0)
+  }, [filter])
 
   const handleImageClick = (service) => {
     setModalImage(service.image)
@@ -149,9 +155,6 @@ const Services = () => {
     { id: "security", label: "Security", count: servicesData.filter((s) => s.category === "security").length },
     { id: "management", label: "Management", count: servicesData.filter((s) => s.category === "management").length },
   ]
-
-  const filteredServices =
-    filter === "all" ? servicesData : servicesData.filter((service) => service.category === filter)
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -180,168 +183,251 @@ const Services = () => {
   }
 
   return (
-    <div id="services" className="relative min-h-screen py-20 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),transparent_50%)]" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
-      </div>
-
-      <motion.div
-        ref={ref}
-        initial={{ opacity: 0, y: 50 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.8 }}
-        className="relative container mx-auto px-4 text-center"
-      >
-        <div className="mb-16">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 bg-clip-text text-transparent"
-          >
+    <div id="services" className="py-16 bg-gradient-to-b from-gray-900 to-black">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          ref={ref}
+          initial={{ opacity: 0, y: 100 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-purple-600 bg-clip-text text-transparent mb-6">
             Professional Certificates
-          </motion.h2>
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={inView ? { scaleX: 1 } : {}}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto mb-8 rounded-full"
-          />
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="text-lg md:text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed"
-          >
-            Showcasing my commitment to continuous learning and professional growth across
-            <span className="text-purple-400 font-semibold"> networking</span>,
-            <span className="text-blue-400 font-semibold"> development</span>, and
-            <span className="text-pink-400 font-semibold"> emerging technologies</span>.
-          </motion.p>
+          </h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto mb-8 rounded-full"></div>
+        </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0, y: 100 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="mb-12 text-gray-300 text-center text-lg md:text-xl max-w-4xl mx-auto leading-relaxed"
+        >
+          Showcasing my commitment to continuous learning and professional growth across
+          <span className="text-purple-400 font-semibold"> networking</span>,
+          <span className="text-blue-400 font-semibold"> development</span>, and
+          <span className="text-pink-400 font-semibold"> emerging technologies</span>.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.6, duration: 0.5 }}
+          className="flex justify-center mb-12"
+        >
+          <div className="flex gap-4 p-2 bg-gray-800/50 backdrop-blur-sm rounded-full border border-gray-700">
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => setFilter(category.id)}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                  filter === category.id
+                    ? "bg-purple-500 text-white shadow-lg shadow-purple-500/25"
+                    : "text-gray-400 hover:text-white hover:bg-gray-700"
+                }`}
+              >
+                {category.label}
+                <span className="ml-2 px-2 py-1 bg-white/20 rounded-full text-xs">{category.count}</span>
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        <div
+          className="relative"
+          onMouseEnter={() => setIsAutoPlaying(false)}
+          onMouseLeave={() => setIsAutoPlaying(true)}
+        >
+          {/* Carousel Container */}
+          <div className="overflow-hidden rounded-2xl">
+            <motion.div
+              className="flex"
+              animate={{ x: `-${currentSlide * 100}%` }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            >
+              {filteredServices.map((service, index) => (
+                <div key={index} className="w-full flex-shrink-0 px-4">
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={inView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ delay: index * 0.1, duration: 0.5 }}
+                    onMouseEnter={() => setHoveredCertificate(service.title)}
+                    onMouseLeave={() => setHoveredCertificate(null)}
+                    className="group relative bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl overflow-hidden hover:border-purple-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-2 max-w-4xl mx-auto"
+                  >
+                    <div className="grid md:grid-cols-2 gap-0">
+                      {/* Image Section */}
+                      <div className="relative overflow-hidden">
+                        <img
+                          src={service.image || "/placeholder.svg"}
+                          alt={`${service.title} Certificate`}
+                          className="w-full h-64 md:h-80 object-cover transition-transform duration-700 group-hover:scale-110"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                        <div className="absolute top-4 right-4">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(service.status)}`}
+                          >
+                            {getStatusText(service.status)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Content Section */}
+                      <div className="p-8 flex flex-col justify-center">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-2xl md:text-3xl font-bold text-white group-hover:text-purple-400 transition-colors duration-300">
+                            {service.title}
+                          </h3>
+                          <span className="text-sm text-gray-500">{service.date}</span>
+                        </div>
+
+                        <div className="flex items-center mb-4 text-sm text-gray-400">
+                          <span className="font-medium">{service.issuer}</span>
+                        </div>
+
+                        <p className="text-gray-400 mb-6 leading-relaxed text-base">{service.description}</p>
+
+                        <div className="mb-8">
+                          <div className="flex flex-wrap gap-2">
+                            {service.skills?.slice(0, 4).map((skill, skillIndex) => (
+                              <span
+                                key={skillIndex}
+                                className="px-3 py-1 bg-purple-500/10 text-purple-300 text-sm rounded-md border border-purple-500/20"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                            {service.skills?.length > 4 && (
+                              <span className="px-3 py-1 bg-gray-500/20 text-gray-400 text-sm rounded-md">
+                                +{service.skills.length - 4} more
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                          {service.link && (
+                            <a
+                              href={service.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 group/btn relative overflow-hidden bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-medium text-center transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                            >
+                              <span className="relative z-10">View Certificate</span>
+                              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
+                            </a>
+                          )}
+
+                          <button
+                            onClick={() => handleImageClick(service)}
+                            className="px-4 py-3 border-2 border-purple-500/50 text-purple-400 rounded-xl hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                            aria-label={`View details for ${service.title}`}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {hoveredCertificate === service.title && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 pointer-events-none"
+                      />
+                    )}
+                  </motion.div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Navigation Arrows */}
+          {filteredServices.length > 1 && (
+            <>
+              <button
+                onClick={prevSlide}
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-gray-800/80 backdrop-blur-sm border border-gray-700 text-white p-3 rounded-full hover:bg-purple-500/20 hover:border-purple-500/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                aria-label="Previous certificate"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              <button
+                onClick={nextSlide}
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-gray-800/80 backdrop-blur-sm border border-gray-700 text-white p-3 rounded-full hover:bg-purple-500/20 hover:border-purple-500/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                aria-label="Next certificate"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </>
+          )}
+
+          {/* Pagination Dots */}
+          {filteredServices.length > 1 && (
+            <div className="flex justify-center mt-8 gap-2">
+              {filteredServices.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    index === currentSlide
+                      ? "bg-purple-500 shadow-lg shadow-purple-500/25"
+                      : "bg-gray-600 hover:bg-gray-500"
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Auto-play indicator */}
+          <div className="absolute top-4 left-4 z-10">
+            <div
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 ${
+                isAutoPlaying
+                  ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                  : "bg-gray-500/20 text-gray-400 border border-gray-500/30"
+              }`}
+            >
+              {isAutoPlaying ? "Auto-play ON" : "Auto-play OFF"}
+            </div>
+          </div>
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 50 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="flex flex-wrap justify-center gap-3 mb-12"
+          transition={{ delay: 0.8, duration: 0.5 }}
+          className="text-center mt-16"
         >
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => setFilter(category.id)}
-              className={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
-                filter === category.id
-                  ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25"
-                  : "bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white"
-              } backdrop-blur-sm border border-white/10`}
-            >
-              {category.label}
-              <span className="ml-2 px-2 py-1 bg-white/20 rounded-full text-xs">{category.count}</span>
-            </button>
-          ))}
+          <p className="text-gray-400 mb-6">Want to learn more about my certifications?</p>
+          <a
+            href="#contact"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-medium hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+          >
+            Get In Touch
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
         </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={inView ? { opacity: 1, scale: 1 } : {}}
-          transition={{ duration: 0.8, delay: 1 }}
-          className="mb-16"
-        >
-          <Slider {...settings}>
-            {filteredServices.map((service, index) => (
-              <div key={index} className="px-3">
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={inView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="group relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg rounded-2xl p-6 border border-white/10 hover:border-purple-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-2"
-                >
-                  <div className="absolute top-4 right-4 z-10">
-                    <div
-                      className={`px-3 py-1 rounded-full text-xs font-medium text-white ${getStatusColor(service.status)}`}
-                    >
-                      {getStatusText(service.status)}
-                    </div>
-                  </div>
-
-                  <div className="relative mb-6 overflow-hidden rounded-xl">
-                    <img
-                      src={service.image || "/placeholder.svg"}
-                      alt={`${service.title} Certificate`}
-                      className="w-full h-48 object-cover cursor-pointer transition-transform duration-500 group-hover:scale-110"
-                      onClick={() => handleImageClick(service)}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="text-left">
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-purple-300 transition-colors duration-300">
-                      {service.title}
-                    </h3>
-
-                    <div className="flex items-center justify-between mb-3 text-sm text-gray-400">
-                      <span className="font-medium">{service.issuer}</span>
-                      <span>{service.date}</span>
-                    </div>
-
-                    <p className="text-gray-300 text-sm leading-relaxed mb-4 line-clamp-3">{service.description}</p>
-
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {service.skills?.slice(0, 3).map((skill, skillIndex) => (
-                        <span
-                          key={skillIndex}
-                          className="px-2 py-1 bg-purple-500/20 text-purple-300 text-xs rounded-full border border-purple-500/30"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                      {service.skills?.length > 3 && (
-                        <span className="px-2 py-1 bg-gray-500/20 text-gray-400 text-xs rounded-full">
-                          +{service.skills.length - 3} more
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleImageClick(service)}
-                        className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-4 rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 hover:-translate-y-0.5"
-                      >
-                        View Details
-                      </button>
-                      {service.link && (
-                        <a
-                          href={service.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-4 py-2 bg-white/10 text-white rounded-lg text-sm font-medium hover:bg-white/20 transition-all duration-300 border border-white/20"
-                        >
-                          Verify
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            ))}
-          </Slider>
-        </motion.div>
-      </motion.div>
+      </div>
 
       {isModalOpen && (
         <Modal
@@ -351,6 +437,7 @@ const Services = () => {
           title={modalTitle}
           description={modalDescription}
           link={modalLink}
+          buttonText="View Certificate"
         />
       )}
     </div>

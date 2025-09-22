@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import project1 from "../assets/project1.png"
 import project2 from "../assets/project2.png"
 import project3 from "../assets/project3.png"
@@ -16,10 +16,12 @@ const Work = () => {
   const [hoveredProject, setHoveredProject] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedProject, setSelectedProject] = useState(null)
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
 
   const { ref: headingRef, inView: headingInView } = useInView({ triggerOnce: true, threshold: 0.2 })
   const { ref: subTextRef, inView: subTextInView } = useInView({ triggerOnce: true, threshold: 0.2 })
-  const { ref: gridRef, inView: gridInView } = useInView({ triggerOnce: true, threshold: 0.2 })
+  const { ref: carouselRef, inView: carouselInView } = useInView({ triggerOnce: true, threshold: 0.2 })
   const { ref: companiesRef, inView: companiesInView } = useInView({ triggerOnce: true, threshold: 0.2 })
 
   const projects = [
@@ -89,6 +91,29 @@ const Work = () => {
 
   const categories = ["all", "web", "app"]
 
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % filteredProjects.length)
+  }
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + filteredProjects.length) % filteredProjects.length)
+  }
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index)
+  }
+
+  useEffect(() => {
+    if (isAutoPlaying && filteredProjects.length > 1) {
+      const interval = setInterval(nextSlide, 5000)
+      return () => clearInterval(interval)
+    }
+  }, [isAutoPlaying, filteredProjects.length])
+
+  useEffect(() => {
+    setCurrentSlide(0)
+  }, [filter])
+
   const openModal = (project) => {
     setSelectedProject(project)
     setIsModalOpen(true)
@@ -128,7 +153,7 @@ const Work = () => {
 
         <motion.div
           initial={{ opacity: 0, y: 50 }}
-          animate={gridInView ? { opacity: 1, y: 0 } : {}}
+          animate={carouselInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.6, duration: 0.5 }}
           className="flex justify-center mb-12"
         >
@@ -149,104 +174,179 @@ const Work = () => {
           </div>
         </motion.div>
 
-        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {filteredProjects.map((project, index) => (
+        <div
+          ref={carouselRef}
+          className="relative"
+          onMouseEnter={() => setIsAutoPlaying(false)}
+          onMouseLeave={() => setIsAutoPlaying(true)}
+        >
+          {/* Carousel Container */}
+          <div className="overflow-hidden rounded-2xl">
             <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 50 }}
-              animate={gridInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: index * 0.2, duration: 0.5 }}
-              onMouseEnter={() => setHoveredProject(project.id)}
-              onMouseLeave={() => setHoveredProject(null)}
-              className="group relative bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl overflow-hidden hover:border-purple-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-2"
+              className="flex"
+              animate={{ x: `-${currentSlide * 100}%` }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
-              <div className="relative overflow-hidden">
-                <img
-                  src={project.image || "/placeholder.svg"}
-                  alt={`${project.title} - ${project.description.slice(0, 50)}...`}
-                  className="w-full h-56 object-cover transition-transform duration-700 group-hover:scale-110"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                <div className="absolute top-4 right-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      project.status === "Live"
-                        ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                        : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
-                    }`}
+              {filteredProjects.map((project, index) => (
+                <div key={project.id} className="w-full flex-shrink-0 px-4">
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={carouselInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ delay: index * 0.1, duration: 0.5 }}
+                    onMouseEnter={() => setHoveredProject(project.id)}
+                    onMouseLeave={() => setHoveredProject(null)}
+                    className="group relative bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl overflow-hidden hover:border-purple-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-2 max-w-4xl mx-auto"
                   >
-                    {project.status}
-                  </span>
-                </div>
-              </div>
+                    <div className="grid md:grid-cols-2 gap-0">
+                      {/* Image Section */}
+                      <div className="relative overflow-hidden">
+                        <img
+                          src={project.image || "/placeholder.svg"}
+                          alt={`${project.title} - ${project.description.slice(0, 50)}...`}
+                          className="w-full h-64 md:h-80 object-cover transition-transform duration-700 group-hover:scale-110"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors duration-300">
-                    {project.title}
-                  </h3>
-                  <span className="text-sm text-gray-500">{project.year}</span>
-                </div>
+                        <div className="absolute top-4 right-4">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              project.status === "Live"
+                                ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                                : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                            }`}
+                          >
+                            {project.status}
+                          </span>
+                        </div>
+                      </div>
 
-                <p className="text-gray-400 mb-4 leading-relaxed text-sm">{project.description}</p>
+                      {/* Content Section */}
+                      <div className="p-8 flex flex-col justify-center">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-2xl md:text-3xl font-bold text-white group-hover:text-purple-400 transition-colors duration-300">
+                            {project.title}
+                          </h3>
+                          <span className="text-sm text-gray-500">{project.year}</span>
+                        </div>
 
-                <div className="mb-6">
-                  <div className="flex flex-wrap gap-2">
-                    {project.techStack.map((tech, techIndex) => (
-                      <span
-                        key={techIndex}
-                        className="px-2 py-1 bg-purple-500/10 text-purple-300 text-xs rounded-md border border-purple-500/20"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                        <p className="text-gray-400 mb-6 leading-relaxed text-base">{project.description}</p>
 
-                <div className="flex gap-3">
-                  <a
-                    href={project.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 group/btn relative overflow-hidden bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-3 rounded-xl font-medium text-center transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800"
-                  >
-                    <span className="relative z-10">View Project</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
-                  </a>
+                        <div className="mb-8">
+                          <div className="flex flex-wrap gap-2">
+                            {project.techStack.map((tech, techIndex) => (
+                              <span
+                                key={techIndex}
+                                className="px-3 py-1 bg-purple-500/10 text-purple-300 text-sm rounded-md border border-purple-500/20"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
 
-                  <button
-                    onClick={() => openModal(project)}
-                    className="px-4 py-3 border-2 border-purple-500/50 text-purple-400 rounded-xl hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800"
-                    aria-label={`View details for ${project.title}`}
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        <div className="flex gap-4">
+                          <a
+                            href={project.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 group/btn relative overflow-hidden bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-medium text-center transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                          >
+                            <span className="relative z-10">View Project</span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
+                          </a>
+
+                          <button
+                            onClick={() => openModal(project)}
+                            className="px-4 py-3 border-2 border-purple-500/50 text-purple-400 rounded-xl hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                            aria-label={`View details for ${project.title}`}
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {hoveredProject === project.id && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 pointer-events-none"
                       />
-                    </svg>
-                  </button>
+                    )}
+                  </motion.div>
                 </div>
-              </div>
-
-              {hoveredProject === project.id && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 pointer-events-none"
-                />
-              )}
+              ))}
             </motion.div>
-          ))}
+          </div>
+
+          {/* Navigation Arrows */}
+          {filteredProjects.length > 1 && (
+            <>
+              <button
+                onClick={prevSlide}
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-gray-800/80 backdrop-blur-sm border border-gray-700 text-white p-3 rounded-full hover:bg-purple-500/20 hover:border-purple-500/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                aria-label="Previous project"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              <button
+                onClick={nextSlide}
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-gray-800/80 backdrop-blur-sm border border-gray-700 text-white p-3 rounded-full hover:bg-purple-500/20 hover:border-purple-500/50 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                aria-label="Next project"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </>
+          )}
+
+          {/* Pagination Dots */}
+          {filteredProjects.length > 1 && (
+            <div className="flex justify-center mt-8 gap-2">
+              {filteredProjects.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    index === currentSlide
+                      ? "bg-purple-500 shadow-lg shadow-purple-500/25"
+                      : "bg-gray-600 hover:bg-gray-500"
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Auto-play indicator */}
+          <div className="absolute top-4 left-4 z-10">
+            <div
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 ${
+                isAutoPlaying
+                  ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                  : "bg-gray-500/20 text-gray-400 border border-gray-500/30"
+              }`}
+            >
+              {isAutoPlaying ? "Auto-play ON" : "Auto-play OFF"}
+            </div>
+          </div>
         </div>
 
         <motion.div
           initial={{ opacity: 0, y: 50 }}
-          animate={gridInView ? { opacity: 1, y: 0 } : {}}
+          animate={carouselInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.8, duration: 0.5 }}
           className="text-center mt-16"
         >
