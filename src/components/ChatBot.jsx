@@ -13,8 +13,16 @@ const ChatBot = () => {
       text: "Hi! I'm Jrz, your virtual assistant. How can I help you today?",
       sender: "bot",
       timestamp: new Date(),
+      options: [
+        { label: "Pricing & Quotes", next: "quotes" },
+        { label: "Schedule a Meeting", next: "meeting" },
+        { label: "Learn About Services", next: "services" },
+        { label: "Talk to a Live Agent", next: "escalate" },
+      ],
     },
   ])
+  const [currentStep, setCurrentStep] = useState("start")
+
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -34,73 +42,94 @@ const ChatBot = () => {
 
   const whatsappConfig = {
     phoneNumber: "+639693134738",
-    businessName: "Jeruz Abiera",
     defaultMessage: "Hi! I'm interested in your services.",
   }
 
   const messengerConfig = {
     pageId: "JrzStflrFB",
-    businessName: "Jeruz Abiera",
     defaultMessage: "Hi! I'm interested in your services.",
   }
 
-  const getInternalResponse = (userMessage) => {
-    const msg = userMessage.toLowerCase()
+  // --- Decision Tree Flows ---
+  const inquiryFlows = {
+    quotes: {
+      text: "Great! Do you need a quote for Web Development, Mobile Apps, or Digital Solutions?",
+      options: [
+        { label: "Web Development", next: "escalate" },
+        { label: "Mobile Apps", next: "escalate" },
+        { label: "Digital Solutions", next: "escalate" },
+      ],
+    },
+    meeting: {
+      text: "Would you like to meet via WhatsApp or Messenger?",
+      options: [
+        { label: "WhatsApp", action: "whatsapp" },
+        { label: "Messenger", action: "messenger" },
+      ],
+    },
+    services: {
+      text: "We offer Web Development, Mobile Apps, and Digital Solutions. Would you like to see more details or talk to an agent?",
+      options: [
+        { label: "See More Details", next: "escalate" },
+        { label: "Talk to Agent", next: "escalate" },
+      ],
+    },
+    escalate: {
+      text: "I’ll connect you with a live support agent. Please choose your preferred channel:",
+      options: [
+        { label: "WhatsApp", action: "whatsapp" },
+        { label: "Messenger", action: "messenger" },
+      ],
+    },
+  }
 
-    // Auto-trigger WhatsApp
-    if (msg.includes("whatsapp") || msg.includes("whats app")) {
-      setTimeout(() => openWhatsAppChat(userMessage), 1500)
-      return "Great! I'm opening WhatsApp for you now so you can continue our conversation there..."
+  // --- Handle Option Clicks ---
+  const handleOptionClick = (option) => {
+    const userMsg = {
+      id: messages.length + 1,
+      text: option.label,
+      sender: "user",
+      timestamp: new Date(),
     }
+    setMessages((prev) => [...prev, userMsg])
 
-    // Auto-trigger Messenger
-    if (msg.includes("messenger") || msg.includes("facebook")) {
-      setTimeout(() => openMessengerChat(userMessage), 1500)
-      return "Perfect! I'm opening Facebook Messenger for you now so we can chat there..."
-    }
-
-    if (msg.includes("quote") || msg.includes("price") || msg.includes("cost")) {
-      return {
-        text: "I'd be happy to help you with pricing! For a detailed quote, I can connect you with our team. Click on your preferred platform:",
-        hasClickableLinks: true,
+    if (option.next) {
+      const step = inquiryFlows[option.next]
+      const botMsg = {
+        id: messages.length + 2,
+        text: step.text,
+        sender: "bot",
+        timestamp: new Date(),
+        options: step.options,
       }
-    }
-
-    if (msg.includes("meeting") || msg.includes("schedule") || msg.includes("appointment")) {
-      return {
-        text: "Great! I can help you schedule a meeting. Choose your preferred platform to coordinate the details:",
-        hasClickableLinks: true,
+      setMessages((prev) => [...prev, botMsg])
+      setCurrentStep(option.next)
+    } else if (option.action === "whatsapp") {
+      const botMsg = {
+        id: messages.length + 2,
+        text: "Click below to open WhatsApp with all your previous chat history forwarded:",
+        sender: "bot",
+        timestamp: new Date(),
+        options: [{ label: "Open WhatsApp", action: "whatsappDirect" }],
       }
-    }
-
-    if (msg.includes("services") || msg.includes("what do you do")) {
-      return {
-        text: "We offer web development, mobile apps, and digital solutions. For detailed information, click to connect with our team:",
-        hasClickableLinks: true,
+      setMessages((prev) => [...prev, botMsg])
+    } else if (option.action === "messenger") {
+      const botMsg = {
+        id: messages.length + 2,
+        text: "Click below to continue with Messenger:",
+        sender: "bot",
+        timestamp: new Date(),
+        options: [{ label: "Open Messenger", action: "messengerDirect" }],
       }
-    }
-
-    if (msg.includes("contact") || msg.includes("phone") || msg.includes("email")) {
-      return {
-        text: "You can reach us directly! Click on your preferred platform for immediate assistance:",
-        hasClickableLinks: true,
-      }
-    }
-
-    return {
-      text: "Thanks for your message! For personalized assistance, click on your preferred platform to connect with our team:",
-      hasClickableLinks: true,
+      setMessages((prev) => [...prev, botMsg])
+    } else if (option.action === "whatsappDirect") {
+      openWhatsAppChat()
+    } else if (option.action === "messengerDirect") {
+      openMessengerChat()
     }
   }
 
-  const handlePlatformClick = (platform, defaultMessage) => {
-    if (platform === "whatsapp") {
-      openWhatsAppChat(defaultMessage)
-    } else if (platform === "messenger") {
-      openMessengerChat(defaultMessage)
-    }
-  }
-
+  // --- WhatsApp / Messenger ---
   const openWhatsAppChat = (customMessage = "") => {
     const messageText = customMessage || message || whatsappConfig.defaultMessage
     const encodedMessage = encodeURIComponent(messageText)
@@ -115,6 +144,7 @@ const ChatBot = () => {
     window.open(messengerUrl, "_blank")
   }
 
+  // --- Manual Typing / Quick Actions still work ---
   const quickActions = [
     { text: "Get a Quote", message: "Hi! I'd like to get a quote for your services.", icon: "💰" },
     { text: "Schedule Meeting", message: "Hi! I'd like to schedule a meeting to discuss my project.", icon: "📅" },
@@ -122,7 +152,7 @@ const ChatBot = () => {
     { text: "Messenger Support", message: "messenger", icon: "💬" },
   ]
 
-  const sendMessage = async () => {
+  const sendMessage = () => {
     if (!message.trim()) return
 
     const userMessage = {
@@ -136,14 +166,14 @@ const ChatBot = () => {
     setMessage("")
     setIsTyping(true)
 
+    // Default response: guide user back to flow
     setTimeout(() => {
-      const response = getInternalResponse(userMessage.text)
       const botResponse = {
         id: messages.length + 2,
-        text: typeof response === "string" ? response : response.text,
+        text: "Thanks for your message! Please choose an option below to continue:",
         sender: "bot",
         timestamp: new Date(),
-        hasClickableLinks: typeof response === "object" ? response.hasClickableLinks : false,
+        options: inquiryFlows[currentStep]?.options || inquiryFlows["quotes"].options,
       }
       setMessages((prev) => [...prev, botResponse])
       setIsTyping(false)
@@ -163,6 +193,7 @@ const ChatBot = () => {
         <>
           <div className="fixed inset-0 bg-black/20 backdrop-blur-sm md:hidden" onClick={() => setIsOpen(false)} />
           <div className="w-80 h-96 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 animate-in slide-in-from-bottom-4 slide-in-from-right-4 duration-300">
+            {/* Header */}
             <div className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white flex justify-between items-center p-4 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-indigo-400/20 animate-pulse"></div>
               <div className="flex items-center gap-3 relative z-10">
@@ -186,6 +217,7 @@ const ChatBot = () => {
               </button>
             </div>
 
+            {/* Messages */}
             <div className="flex-1 p-4 overflow-y-auto bg-gradient-to-b from-gray-50 to-white">
               <div className="space-y-4">
                 {messages.map((msg, index) => (
@@ -211,30 +243,18 @@ const ChatBot = () => {
 
                       <p className="text-sm leading-relaxed relative z-10">{msg.text}</p>
 
-                      {msg.sender === "bot" && msg.hasClickableLinks && (
-                        <div className="flex gap-2 mt-3 relative z-10">
-                          <button
-                            onClick={() =>
-                              handlePlatformClick(
-                                "whatsapp",
-                                "Hi! I'm interested in your services and would like to continue our conversation.",
-                              )
-                            }
-                            className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-3 py-2 rounded-full text-xs transition-all duration-200 flex items-center gap-1 shadow-md hover:shadow-lg hover:scale-105"
-                          >
-                            📱 WhatsApp
-                          </button>
-                          <button
-                            onClick={() =>
-                              handlePlatformClick(
-                                "messenger",
-                                "Hi! I'm interested in your services and would like to continue our conversation.",
-                              )
-                            }
-                            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 py-2 rounded-full text-xs transition-all duration-200 flex items-center gap-1 shadow-md hover:shadow-lg hover:scale-105"
-                          >
-                            💬 Messenger
-                          </button>
+                      {/* Render options if present */}
+                      {msg.options && (
+                        <div className="flex flex-col gap-2 mt-3 relative z-10">
+                          {msg.options.map((opt, i) => (
+                            <button
+                              key={i}
+                              onClick={() => handleOptionClick(opt)}
+                              className="px-3 py-2 bg-purple-100 hover:bg-purple-200 rounded-lg text-sm text-purple-700 text-left transition"
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
                         </div>
                       )}
 
@@ -272,6 +292,7 @@ const ChatBot = () => {
               </div>
             </div>
 
+            {/* Input + Quick Actions */}
             <div className="p-4 border-t bg-white/80 backdrop-blur-sm">
               <div className="flex gap-2 mb-3">
                 <div className="flex-1 relative">
