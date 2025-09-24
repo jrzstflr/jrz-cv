@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { AiOutlineMenu } from "react-icons/ai"
 import { IoCloseSharp } from "react-icons/io5"
 import { motion, AnimatePresence } from "framer-motion"
+import CV from "../assets/CV.pdf"
 import { Link } from "react-scroll"
 
 const Navbar = () => {
@@ -99,8 +100,8 @@ const Navbar = () => {
 
         <div className="ml-auto sm:ml-0">
           <a
-            href="/CV.pdf"
-            download="Jeruz_Abiera_CV.pdf"
+            href={CV}
+            download="CV.pdf"
             onClick={handleCVDownload}
             className={`md:text-base lg:text-lg bg-purple-500 hover:bg-purple-400 text-white px-4 py-2 rounded-full transition-all duration-300 ${
               isDownloading ? "opacity-75 cursor-not-allowed" : ""
@@ -182,8 +183,8 @@ const Navbar = () => {
               </ul>
 
               <a
-                href="/CV.pdf"
-                download="Jeruz_Abiera_CV.pdf"
+                href={CV}
+                download="CV.pdf"
                 onClick={handleCVDownload}
                 className={`text-lg bg-purple-500 hover:bg-purple-400 text-white px-6 py-3 mt-8 rounded-full transition-all duration-300 ${
                   isDownloading ? "opacity-75 cursor-not-allowed" : ""
