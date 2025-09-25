@@ -10,6 +10,8 @@ import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import Companies from "./Companies"
 import Modal from "./Modal"
+import RatingTestimonial from "./RatingTestimonial"
+import TestimonialList from "./TestimonialList"
 
 const Work = () => {
   const [filter, setFilter] = useState("all")
@@ -18,11 +20,13 @@ const Work = () => {
   const [selectedProject, setSelectedProject] = useState(null)
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [testimonialRefresh, setTestimonialRefresh] = useState(0)
 
   const { ref: headingRef, inView: headingInView } = useInView({ triggerOnce: true, threshold: 0.2 })
   const { ref: subTextRef, inView: subTextInView } = useInView({ triggerOnce: true, threshold: 0.2 })
   const { ref: carouselRef, inView: carouselInView } = useInView({ triggerOnce: true, threshold: 0.2 })
   const { ref: companiesRef, inView: companiesInView } = useInView({ triggerOnce: true, threshold: 0.2 })
+  const { ref: testimonialRef, inView: testimonialInView } = useInView({ triggerOnce: true, threshold: 0.2 })
 
   const projects = [
     {
@@ -122,6 +126,10 @@ const Work = () => {
   const closeModal = () => {
     setIsModalOpen(false)
     setSelectedProject(null)
+  }
+
+  const handleTestimonialSubmitted = () => {
+    setTestimonialRefresh((prev) => prev + 1)
   }
 
   return (
@@ -258,7 +266,7 @@ const Work = () => {
 
                           <button
                             onClick={() => openModal(project)}
-                            className="px-4 py-3 border-2 border-purple-500/50 text-purple-400 rounded-xl hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+                            className="px-4 py-3 border-2 border-purple-500/50 text-purple-400 rounded-xl hover:bg-purple-500/10 hover:border-purple-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500"
                             aria-label={`View details for ${project.title}`}
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -344,11 +352,37 @@ const Work = () => {
           </div>
         </div>
 
+        {/* Testimonials Section */}
+        <motion.div
+          ref={testimonialRef}
+          initial={{ opacity: 0, y: 100 }}
+          animate={testimonialInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="mt-32"
+        >
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-purple-600 bg-clip-text text-transparent mb-6">
+              Client Testimonials
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto mb-8 rounded-full"></div>
+            <p className="text-gray-300 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
+              Don't just take my word for it. Here's what clients and collaborators have to say about working with me.
+            </p>
+          </div>
+
+          <div className="mb-12">
+            <RatingTestimonial onSubmitted={handleTestimonialSubmitted} autoApprove={true} />
+          </div>
+
+          <TestimonialList key={testimonialRefresh} max={12} showPending={false} />
+        </motion.div>
+
+        {/* CTA Section */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={carouselInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.8, duration: 0.5 }}
-          className="text-center mt-16"
+          className="text-center mt-20"
         >
           <p className="text-gray-400 mb-6">Interested in working together?</p>
           <a
@@ -363,6 +397,7 @@ const Work = () => {
         </motion.div>
       </div>
 
+      {/* Companies Section */}
       <motion.div
         ref={companiesRef}
         initial={{ opacity: 0, y: 100 }}
@@ -373,6 +408,7 @@ const Work = () => {
         <Companies />
       </motion.div>
 
+      {/* Modal */}
       {isModalOpen && selectedProject && (
         <Modal
           isOpen={isModalOpen}
