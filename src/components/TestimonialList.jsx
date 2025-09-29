@@ -1,18 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import {
-  auth,
-  onAuthStateChanged,
-  db,
-  collection,
-  query,
-  where,
-  limit,
-  onSnapshot,
-  deleteDoc,
-  doc,
-} from "../lib/firebase"
+import { auth, onAuthStateChanged, db, collection, query, limit, onSnapshot, deleteDoc, doc } from "../lib/firebase"
 
 export default function TestimonialList({ max = 12, showPending = false }) {
   const [testimonials, setTestimonials] = useState([])
@@ -36,15 +25,7 @@ export default function TestimonialList({ max = 12, showPending = false }) {
 
   useEffect(() => {
     const testimonialsRef = collection(db, "testimonials")
-    let q
-
-    if (showPending) {
-      // Show all testimonials (for admin/owner view)
-      q = query(testimonialsRef, limit(max))
-    } else {
-      // Show only approved testimonials (for public view)
-      q = query(testimonialsRef, where("approved", "==", true), limit(max))
-    }
+    const q = query(testimonialsRef, limit(max))
 
     const unsubscribe = onSnapshot(
       q,
@@ -168,15 +149,6 @@ export default function TestimonialList({ max = 12, showPending = false }) {
             {/* Timestamp and approval status */}
             <div className="flex items-center justify-between text-xs text-gray-500">
               <span>{testimonial.createdAt?.toDate?.()?.toLocaleDateString() || "Recently"}</span>
-              {showPending && (
-                <span
-                  className={`px-2 py-1 rounded-full text-xs ${
-                    testimonial.approved ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"
-                  }`}
-                >
-                  {testimonial.approved ? "Approved" : "Pending"}
-                </span>
-              )}
             </div>
           </div>
         ))}
