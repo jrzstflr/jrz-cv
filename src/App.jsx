@@ -18,7 +18,9 @@ const App = () => {
       <About />
       <Services />
       <Work />
+      <div className="max-w-2xl mx-auto mb-16">
       <RatingTestimonial />
+      </div>
       <TestimonialList showPending={true} />
       <Contact />
       <ChatBot />
