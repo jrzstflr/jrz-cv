@@ -1,17 +1,16 @@
 import { initializeApp } from "firebase/app"
-import { 
-  getAuth, 
-  GithubAuthProvider, 
+import {
+  getAuth,
+  GithubAuthProvider,
   GoogleAuthProvider,
   signInWithPopup,
-  // Add these new imports for email/password
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendEmailVerification,
   sendPasswordResetEmail,
   updateProfile,
-  signOut, 
-  onAuthStateChanged 
+  signOut,
+  onAuthStateChanged,
 } from "firebase/auth"
 import {
   getFirestore,
@@ -50,7 +49,6 @@ export {
   githubProvider,
   googleProvider,
   signInWithPopup,
-  // Export new email/password functions
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendEmailVerification,

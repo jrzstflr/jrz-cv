@@ -26,9 +26,8 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
   const [comment, setComment] = useState("")
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
-  
-  // New state for email/password authentication
-  const [authMode, setAuthMode] = useState("signin") // "signin" | "signup" | "reset"
+
+  const [authMode, setAuthMode] = useState("signin")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [displayName, setDisplayName] = useState("")
@@ -37,21 +36,22 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(
-        u
-          ? {
-              uid: u.uid,
-              displayName: u.displayName || u.email,
-              photoURL: u.photoURL,
-              emailVerified: u.emailVerified,
-            }
-          : null,
-      )
+      if (u) {
+        const providerId = u.providerData[0]?.providerId
+        setUser({
+          uid: u.uid,
+          displayName: u.displayName || u.email,
+          photoURL: u.photoURL,
+          emailVerified: u.emailVerified,
+          providerId: providerId, // Store provider type
+        })
+      } else {
+        setUser(null)
+      }
     })
     return () => unsub()
   }, [])
 
-  // OAuth sign-in (Google/GitHub)
   async function handleOAuthSignIn(provider) {
     try {
       setAuthError("")
@@ -62,7 +62,6 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
     }
   }
 
-  // Email/Password sign up
   async function handleSignUp(e) {
     e.preventDefault()
     if (!email || !password || !displayName) {
@@ -78,15 +77,13 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
     setAuthError("")
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-      
-      // Update profile with display name
+
       await updateProfile(userCredential.user, {
         displayName: displayName,
       })
 
-      // Send verification email
       await sendEmailVerification(userCredential.user)
-      
+
       setAuthSuccess("Account created! Please check your email to verify your account.")
       setEmail("")
       setPassword("")
@@ -98,7 +95,6 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
     setLoading(false)
   }
 
-  // Email/Password sign in
   async function handleSignIn(e) {
     e.preventDefault()
     if (!email || !password) {
@@ -119,7 +115,6 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
     setLoading(false)
   }
 
-  // Password reset
   async function handlePasswordReset(e) {
     e.preventDefault()
     if (!email) {
@@ -140,10 +135,9 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
     setLoading(false)
   }
 
-  // Resend verification email
   async function handleResendVerification() {
     if (!auth.currentUser) return
-    
+
     try {
       await sendEmailVerification(auth.currentUser)
       setAuthSuccess("Verification email sent! Check your inbox.")
@@ -153,7 +147,6 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
     }
   }
 
-  // Helper function to get user-friendly error messages
   function getErrorMessage(errorCode) {
     switch (errorCode) {
       case "auth/email-already-in-use":
@@ -175,16 +168,21 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
     }
   }
 
+  function needsEmailVerification() {
+    if (!user) return false
+    // Only require verification for email/password users
+    return user.providerId === "password" && !user.emailVerified
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     if (!user) return alert("Please sign in first.")
-    
-    // Check email verification for email/password users
-    if (!user.emailVerified && auth.currentUser?.providerData[0]?.providerId === "password") {
+
+    if (needsEmailVerification()) {
       setAuthError("Please verify your email before submitting a testimonial.")
       return
     }
-    
+
     if (!comment.trim()) return alert("Please write a testimonial.")
 
     setLoading(true)
@@ -244,12 +242,9 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
               />
             </svg>
             <h3 className="text-xl font-semibold text-white mb-2">Share Your Experience</h3>
-            <p className="text-gray-400 mb-6">
-              Sign in to leave a testimonial and help others learn about my work.
-            </p>
+            <p className="text-gray-400 mb-6">Sign in to leave a testimonial and help others learn about my work.</p>
           </div>
 
-          {/* Error/Success Messages */}
           {authError && (
             <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
               {authError}
@@ -261,7 +256,6 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
             </div>
           )}
 
-          {/* OAuth Providers */}
           <div className="space-y-3 mb-6">
             <button
               onClick={() => handleOAuthSignIn(googleProvider)}
@@ -303,7 +297,6 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
             </button>
           </div>
 
-          {/* Divider */}
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-700"></div>
@@ -313,7 +306,6 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
             </div>
           </div>
 
-          {/* Email/Password Forms */}
           {authMode === "signin" && (
             <form onSubmit={handleSignIn} className="space-y-4">
               <div>
@@ -437,9 +429,7 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
                   placeholder="your@email.com"
                   className="w-full px-4 py-3 rounded-lg bg-gray-700/50 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
-                <p className="text-xs text-gray-400 mt-1">
-                  We'll send you a link to reset your password
-                </p>
+                <p className="text-xs text-gray-400 mt-1">We'll send you a link to reset your password</p>
               </div>
               <button
                 type="submit"
@@ -475,10 +465,14 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
             <div className="flex-1">
               <div className="font-semibold text-white">{user.displayName}</div>
               <div className="text-sm text-gray-400">
-                {user.emailVerified ? (
-                  <span className="text-green-400">Verified</span>
+                {user.providerId === "password" ? (
+                  user.emailVerified ? (
+                    <span className="text-green-400">Email verified</span>
+                  ) : (
+                    <span className="text-yellow-400">Email not verified</span>
+                  )
                 ) : (
-                  <span className="text-yellow-400">Email not verified</span>
+                  <span className="text-green-400">Signed in</span>
                 )}
               </div>
             </div>
@@ -491,12 +485,9 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
             </button>
           </div>
 
-          {/* Email verification warning */}
-          {!user.emailVerified && auth.currentUser?.providerData[0]?.providerId === "password" && (
+          {needsEmailVerification() && (
             <div className="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-              <p className="text-sm text-yellow-400 mb-2">
-                Please verify your email to submit testimonials.
-              </p>
+              <p className="text-sm text-yellow-400 mb-2">Please verify your email to submit testimonials.</p>
               <button
                 type="button"
                 onClick={handleResendVerification}
@@ -564,7 +555,7 @@ export default function RatingTestimonial({ onSubmitted, autoApprove = true }) {
 
           <button
             type="submit"
-            disabled={loading || !comment.trim() || (!user.emailVerified && auth.currentUser?.providerData[0]?.providerId === "password")}
+            disabled={loading || !comment.trim() || needsEmailVerification()}
             className="w-full px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             {loading ? (
