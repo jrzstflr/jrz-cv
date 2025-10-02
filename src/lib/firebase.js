@@ -1,5 +1,18 @@
 import { initializeApp } from "firebase/app"
-import { getAuth, GithubAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "firebase/auth"
+import { 
+  getAuth, 
+  GithubAuthProvider, 
+  GoogleAuthProvider,
+  signInWithPopup,
+  // Add these new imports for email/password
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  updateProfile,
+  signOut, 
+  onAuthStateChanged 
+} from "firebase/auth"
 import {
   getFirestore,
   collection,
@@ -29,12 +42,20 @@ const auth = getAuth(app)
 const db = getFirestore(app)
 
 const githubProvider = new GithubAuthProvider()
+const googleProvider = new GoogleAuthProvider()
 
 export {
   auth,
   db,
   githubProvider,
+  googleProvider,
   signInWithPopup,
+  // Export new email/password functions
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  updateProfile,
   signOut,
   onAuthStateChanged,
   collection,
