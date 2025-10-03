@@ -6,6 +6,7 @@ import project2 from "../assets/project2.png"
 import project3 from "../assets/project3.png"
 import project4 from "../assets/project4.png"
 import project5 from "../assets/project5.png"
+import project6 from "../assets/project6.png"
 import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import Companies from "./Companies"
@@ -81,7 +82,19 @@ const Work = () => {
       image: project5,
       link: "https://jrzfiltertool.vercel.app/",
       category: "app",
-      techStack: ["React", "Node,JS", "JavaScript"],
+      techStack: ["React", "Node.JS", "JavaScript"],
+      status: "Live",
+      year: "2025",
+    },
+    {
+      id: 6,
+      title: "Message Dashboard",
+      description:
+        "The MessageFilter Pro Enterprise Dashboard lets users upload and analyze message data in JSON format. It provides tools for viewing messages, running analytics, checking audit logs, and managing filters and rules. Users can upload data.json files, generate reports, and ensure communication compliance with ease.",
+      image: project6,
+      link: "https://message-dashboard.vercel.app/",
+      category: "app",
+      techStack: ["React", "Node.JS", "TypeScript"],
       status: "Live",
       year: "2025",
     },
